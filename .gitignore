@@ -1,0 +1,23 @@
+*.pyc
+*.log
+node_modules
+coverage/
+arches_csv/logs
+arches_csv/export_deliverables
+arches_csv/cantaloupe/*
+arches_csv/staticfiles
+arches_csv/media/packages
+arches_csv/media/build/
+arches_csv/uploadedfiles/*
+arches_csv/settings_local.py
+webpack-stats.json
+.vscode/
+*.egg-info
+.DS_STORE
+CACHE
+.tsconfig-paths.json
+.frontend-configuration-settings.json
+
+# Packaging
+build/
+dist/
