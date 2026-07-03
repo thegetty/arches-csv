@@ -17,16 +17,18 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Framework :: Django",
     "Framework :: Django :: 4.2",
-    "Intended Audience :: Developers",
-    "Intended Audience :: Science/Research",
-    "Intended Audience :: Information Technology",
-    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
 ]
 requires-python = ">=3.10"
 dependencies = [
     "arches>=7.6.17,<7.7.0",
 ]
-version = "0.0.1"
+version = "0.0.2"
+
+[project.urls]
+Homepage = "https://archesproject.org/"
+Documentation = "https://arches.readthedocs.io"
+Repository = "https://github.com/thegetty/arches-csv.git"
+Issues = "https://github.com/thegetty/arches-csv"
 
 [project.optional-dependencies]
 dev = [

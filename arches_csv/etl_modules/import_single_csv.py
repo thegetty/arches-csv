@@ -17,7 +17,7 @@ from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import ETLModule, GraphModel, Node, NodeGroup, LoadStaging, TileModel
 from arches.app.models.system_settings import settings
-import arches_provenance.tasks as tasks
+import arches_csv.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.file_validator import FileValidator
 from arches.app.etl_modules.base_import_module import BaseImportModule
@@ -63,7 +63,7 @@ class ImportSingleCsv(BaseImportModule):
         self.datatype_factory = DataTypeFactory()
         self.node_lookup = {}
         self.blank_tile_lookup = {}
-    
+
     def Child_result(self, cursor, sql_child, nodeid, header):
         cursor.execute(sql_child, [nodeid, nodeid])
 
@@ -82,7 +82,7 @@ class ImportSingleCsv(BaseImportModule):
 
             self.Child_result(cursor, sql_child, str(nodegroup[0]), header)
             self.Child_parent(cursor, sql_childparent, sql_child, str(nodegroup[0]), header)
-        
+
 
     def csv_label(self, request):
         graphid = request.POST.get('id', None)
@@ -96,11 +96,11 @@ class ImportSingleCsv(BaseImportModule):
                 result = cursor.fetchall()
                 header=['ResourceID']
                 for info in result:
-                    
+
                     datatype=info[0]
                     name=info[1]
                     nodegroupid=str(info[2])
-                    
+
                     if datatype!='semantic':
                         header.append(name)
                     self.Child_result(cursor, sql_child, nodegroupid, header)
@@ -145,7 +145,7 @@ class ImportSingleCsv(BaseImportModule):
 
         filteredNodes = []
         for node in nodes:
-            
+
             filteredNodes.append(node)
         return {"success": True, "data": filteredNodes}
 
@@ -269,7 +269,7 @@ class ImportSingleCsv(BaseImportModule):
         return {"success": True, "data": data}
 
     def validate(self, loadid):
-       
+
         """
         Creates records in the load_staging table (validated before poulating the load_staging table with error message)
         Collects error messages if any and returns table of error messages
@@ -287,13 +287,13 @@ class ImportSingleCsv(BaseImportModule):
         updatevalue = request.POST.get("hasUpdate")
         if type(fieldnames) != list:
             fieldnames = fieldnames.split(",")
-        
+
         fieldnames[1]='_label (en)'
         csv_mapping = request.POST.get("fieldMapping")
-        
+
         if csv_mapping and type(csv_mapping) == str:
             csv_mapping = json.loads(csv_mapping)
-        
+
         csv_file_name = request.POST.get("csvFileName")
         column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
         id_label = "resourceid"
@@ -342,8 +342,8 @@ class ImportSingleCsv(BaseImportModule):
         csv_file_name,
         id_label,
         updatevalue
-    ):  
-        
+    ):
+
         if updatevalue == 'true':
             self.populate_staging_table1(
                 loadid,
@@ -384,7 +384,7 @@ class ImportSingleCsv(BaseImportModule):
             tiles_data = TileModel.objects.filter(resourceinstance=Subquery(subquery)).values('nodegroup', 'parenttile', 'tileid')
             listNodegroupParent=[]
             for row in tiles_data:
-                
+
                 count = listNodegroupParent.count([row['nodegroup'],str(row['parenttile'])])
                 TileModel.objects.filter(tileid=str(row['tileid'])).update(sortorder=count)
                 listNodegroupParent.append([row['nodegroup'], str(row['parenttile'])])
@@ -417,7 +417,7 @@ class ImportSingleCsv(BaseImportModule):
             csv_mapping = json.loads(csv_mapping)
         csv_file_name = request.POST.get("csvFileName")
         id_label = "resourceid"
-        
+
         load_task = tasks.load_single_csv.apply_async(
             (
                 self.userid,
@@ -497,11 +497,11 @@ class ImportSingleCsv(BaseImportModule):
         )
     def error_nodegroupid(self, cursor, dict_by_nodegroup, nodeid, csv_file_name, loadid, tilesid, i):
         for errorNodegroup in dict_by_nodegroup[nodeid]:
-                                    
+
             for errorKey in errorNodegroup:
                 message_new="Haven't define the nodeparent of nodechild "+ Node.objects.get(nodeid=errorKey).alias
                 titles="Missing nodeparent"
-                
+
                 cursor.execute(
                             """
                             INSERT INTO load_errors (type, source, error, message, loadid, nodeid)
@@ -519,7 +519,7 @@ class ImportSingleCsv(BaseImportModule):
                     """update load_staging set passes_validation=false where tileid=%s and nodegroupid=%s;""",
                     (tilesid[i], nodeid),
                 )
-    
+
     def create_nodes_groups(self, cursor, fieldnames, graphid, row, id_label, temp_dir, csv_mapping, csv_file_name, loadid):
         dict_by_nodegroup = {}
         transformed_value=None
@@ -545,13 +545,13 @@ class ImportSingleCsv(BaseImportModule):
                 config["path"] = temp_dir
 
                 if source_value:
-                    
-                    
+
+
                     if (datatype == "string" or datatype=='transformed_value'):
-                        
+
 
                         try:
-                            
+
                             code = csv_mapping[i]["language"]["code"]
                             direction = csv_mapping[i]["language"][
                                 "default_direction"
@@ -563,10 +563,10 @@ class ImportSingleCsv(BaseImportModule):
                                     "value": row[i],
                                     "direction": direction,
                                 }
-                            } 
+                            }
                         except:
                             transformed_value = source_value
-           
+
                         value = (
                             datatype_instance.transform_value_for_tile(
                                 transformed_value, **config
@@ -574,7 +574,7 @@ class ImportSingleCsv(BaseImportModule):
                             if transformed_value
                             else None
                         )
-                        
+
                         errors = datatype_instance.validate(
                             value, nodeid=node
                         )
@@ -633,9 +633,9 @@ class ImportSingleCsv(BaseImportModule):
                                     }
                                 }
                             ]
-                    
+
         return dict_by_nodegroup
-    
+
     def populate_staging_table1(
         self,
         loadid,
@@ -653,8 +653,8 @@ class ImportSingleCsv(BaseImportModule):
             reader = csv.reader(
                 text_wrapper
             )  # if there is a duplicate field, DictReader will not work
-            
-            
+
+
             if has_headers:
                 next(reader)
             with connection.cursor() as cursor:
@@ -665,7 +665,7 @@ class ImportSingleCsv(BaseImportModule):
                             resourceid = uuid.UUID(row[id_index])
                             legacyid = None
                         except (AttributeError, ValueError):
-                            
+
                             resourceid = uuid.uuid4()
                             legacyid = None
                     else:
@@ -684,22 +684,22 @@ class ImportSingleCsv(BaseImportModule):
                             tiledata_update[key] = None
                         use_key=[]
                         for node in dict_by_nodegroup[nodegroup]:
-                            
+
                             for key in node:
                                 if key in use_key:
                                     json_info.append([nodegroup, tile_data.copy(), tiledata_update.copy()])
                                     use_key=[]
                                     tile_data = self.get_blank_tile_lookup(nodegroup)
                                     tiledata_update = self.get_blank_tile_lookup(nodegroup)
-                                    
+
                                 tile_data[key] = node[key]['value']
                                 tiledata_update[key] = node[key]
-                                
+
 
                                 use_key.append(key)
-                            
+
                         json_info.append([nodegroup,  tile_data.copy(), tiledata_update.copy()])
-                    
+
                     list_update_tileid = []
                     filtered_json_info = []
                     filtered_db_data = []
@@ -727,7 +727,7 @@ class ImportSingleCsv(BaseImportModule):
                                 for (ng, tile_data, update_load) in json_info:
                                     if str(ng) == str(nodegroupid):
                                         flag = False
-                                        
+
                                 if flag:
                                     cursor.execute(
                                             """SELECT message FROM load_errors WHERE loadid = %s""",
@@ -752,7 +752,7 @@ class ImportSingleCsv(BaseImportModule):
                                         ),
                                     )
                                     return {"success": False, "data": message}
-                                
+
                             db_data = []
                             db_set = set()
                             db_map = {}  # tileid -> parsed tiledata
@@ -773,7 +773,7 @@ class ImportSingleCsv(BaseImportModule):
                                     local_set.add(json.dumps(tile_data, sort_keys=True))
                                     map = {"nodegroupid": ng, "tiledata": tile_data, "update_load": update_load}
                                     lacal_map.append(map)
-                                
+
                             diff_local = local_set - db_set
                             diff_db = db_set - local_set
                             # check for same tileids
@@ -786,7 +786,7 @@ class ImportSingleCsv(BaseImportModule):
 
                             # save the differences
                             for item in lacal_map:
-                                
+
                                 if json.dumps(item['tiledata'], sort_keys=True) in diff_local:
                                     filtered_json_info.append({
                                         "nodegroupid": item['nodegroupid'],
@@ -800,10 +800,10 @@ class ImportSingleCsv(BaseImportModule):
                                 if parsed_json in diff_db:
                                     filtered_db_data.append({"nodegroupid": db_nodegroup, "tileid": tileid, "tiledata": parsed})
 
-                    
+
                     #local
                     if filtered_json_info ==[] or filtered_db_data == []:
-                        
+
                         cursor.execute(
                                 """SELECT message FROM load_errors WHERE loadid = %s""",
                                 [self.loadid],
@@ -825,7 +825,7 @@ class ImportSingleCsv(BaseImportModule):
                             ),
                         )
                         return {"success": False, "data": message}
-                    
+
                     for local_item in filtered_json_info:
                         local_nodegroup = local_item['nodegroupid']
                         local_tiledata = local_item['update_load']
@@ -834,10 +834,10 @@ class ImportSingleCsv(BaseImportModule):
                                 self.insert_loadstaging(cursor, local_tiledata, local_nodegroup, legacyid, resourceid, db_item['tileid'], loadid, csv_file_name, passes_validation, 'update')
                                 filtered_db_data.remove(db_item)
                                 break
-                        
+
         message = "staging table populated"
         return {"success": True, "data": message}
-    
+
     def populate_staging_table(
         self,
         loadid,
@@ -855,8 +855,8 @@ class ImportSingleCsv(BaseImportModule):
             reader = csv.reader(
                 text_wrapper
             )  # if there is a duplicate field, DictReader will not work
-            
-            
+
+
             if has_headers:
                 next(reader)
             with connection.cursor() as cursor:
@@ -867,7 +867,7 @@ class ImportSingleCsv(BaseImportModule):
                             resourceid = uuid.UUID(row[id_index])
                             legacyid = None
                         except (AttributeError, ValueError):
-                            
+
                             resourceid = uuid.uuid4()
                             legacyid = None
                     else:
@@ -883,9 +883,9 @@ class ImportSingleCsv(BaseImportModule):
                         for key in tile_data:
                             tile_data[key] = None
                         for node in dict_by_nodegroup[nodegroup]:
-                            
+
                             for key in node:
-                                
+
                                 if tile_data[key]:
                                     tileid = uuid.uuid4()
                                     tilesid.append(tileid)
@@ -897,7 +897,7 @@ class ImportSingleCsv(BaseImportModule):
                                     tile_data[key] = node[key]
                                 else:
                                     tile_data[key] = node[key]
-                                    
+
                                 if node[key]["valid"] is False:
                                     passes_validation = False
                         tileid = uuid.uuid4()
@@ -907,11 +907,11 @@ class ImportSingleCsv(BaseImportModule):
                 listCheckExistNodeId=[]
                 for i, nodeid in enumerate(nodegroupsid):
                     parents = NodeGroup.objects.get(nodegroupid=str(nodeid)).parentnodegroup
-                    
+
                     if parents is not None:
                         indices = [index for index, value in enumerate(nodegroupsid) if value == str(parents.nodegroupid)]
                         if str(parents.nodegroupid) in listCheckExistNodeId and len(indices)>1:
-                            
+
                             try:
                                 number=listCheckExistNodeId.count(str(parents.nodegroupid))
                                 listCheckExistNodeId.append(str(parents.nodegroupid))
@@ -932,7 +932,7 @@ class ImportSingleCsv(BaseImportModule):
                                     (tilesid[j], tilesid[i], nodeid),
                                 )
                             except:
-                                
+
                                 self.error_nodegroupid(cursor, dict_by_nodegroup, nodeid, csv_file_name, loadid, tilesid, i)
 
                 cursor.execute(
@@ -966,4 +966,3 @@ class ImportSingleCsv(BaseImportModule):
                     (nodeid,) = row
                     self.blank_tile_lookup[nodegroupid][str(nodeid)] = None
         return self.blank_tile_lookup[nodegroupid].copy()
-
