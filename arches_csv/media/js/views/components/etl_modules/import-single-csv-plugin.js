@@ -422,7 +422,7 @@ const viewModel = function(params) {
 
         this.init();
 };
-ko.components.register('import-single-csv', {
+ko.components.register('import-single-csv-plugin', {
     viewModel: viewModel,
     template: importSingleCSVTemplate,
 });
