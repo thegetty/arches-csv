@@ -1,3 +1,7 @@
-from arches_csv.etl_modules.import_single_csv import ImportSingleCsv
+from arches_csv.etl_modules.ext_import_single_csv import (
+    ImportSingleCsv as BaseImportSingleCsv,
+)
 
-__all__ = ["ImportSingleCsv"]
+
+class ImportSingleCsv(BaseImportSingleCsv):
+    pass
