@@ -6,7 +6,7 @@ import stringUtils from "utils/strings";
 import uuid from "uuid";
 import arches from "arches";
 import JsonErrorAlertViewModel from "viewmodels/alert-json";
-import importSingleCSVTemplate from "templates/views/components/etl_modules/import-single-csv.htm";
+import importSingleCSVTemplate from "templates/views/components/etl_modules/import-single-csv-plugin.htm";
 import "views/components/simple-switch";
 import "bindings/datatable";
 import "bindings/dropzone";
