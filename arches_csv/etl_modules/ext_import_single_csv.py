@@ -39,6 +39,7 @@ class ImportSingleCsv(BaseImportModule):
             else settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
         )
         self.mode = "cli" if not request and params else "ui"
+        self.validated_data = {}
         try:
             self.user = User.objects.get(pk=self.userid)
         except User.DoesNotExist:
@@ -464,36 +465,61 @@ class ImportSingleCsv(BaseImportModule):
         message = "load event created"
         return {"success": True, "data": message}
 
+    def load_staging_has_sortorder(self, cursor):
+        if not hasattr(self, "_load_staging_has_sortorder"):
+            cursor.execute(
+                """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_name = 'load_staging'
+                    AND column_name = 'sortorder'
+                )
+                """
+            )
+            self._load_staging_has_sortorder = cursor.fetchone()[0]
+        return self._load_staging_has_sortorder
+
     def insert_loadstaging(self,cursor,tile_data,nodegroup,legacyid, resourceid,tileid, loadid, csv_file_name, passes_validation, operation):
         tile_value_json = JSONSerializer().serialize(tile_data)
         node_depth = 0
 
+        columns = [
+            "nodegroupid",
+            "legacyid",
+            "resourceid",
+            "tileid",
+            "value",
+            "loadid",
+            "nodegroup_depth",
+            "source_description",
+            "operation",
+            "passes_validation",
+        ]
+        values = [
+            nodegroup,
+            legacyid,
+            resourceid,
+            tileid,
+            tile_value_json,
+            loadid,
+            node_depth,
+            csv_file_name,
+            operation,
+            passes_validation,
+        ]
+        if self.load_staging_has_sortorder(cursor):
+            columns.append("sortorder")
+            values.append(0)
+
+        placeholders = ",".join(["%s"] * len(columns))
+        column_names = ", ".join(columns)
         cursor.execute(
-            """
+            f"""
             INSERT INTO load_staging (
-                nodegroupid,
-                legacyid,
-                resourceid,
-                tileid,
-                value,
-                loadid,
-                nodegroup_depth,
-                source_description,
-                operation,
-                passes_validation
-            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
-            (
-                nodegroup,
-                legacyid,
-                resourceid,
-                tileid,
-                tile_value_json,
-                loadid,
-                node_depth,
-                csv_file_name,
-                operation,
-                passes_validation,
-            ),
+                {column_names}
+            ) VALUES ({placeholders})""",
+            values,
         )
     def error_nodegroupid(self, cursor, dict_by_nodegroup, nodeid, csv_file_name, loadid, tilesid, i):
         for errorNodegroup in dict_by_nodegroup[nodeid]:

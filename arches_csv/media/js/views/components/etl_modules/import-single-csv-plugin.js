@@ -1,19 +1,19 @@
-define([
-    'knockout',
-    'knockout-mapping',
-    'jquery',
-    'dropzone',
-    'utils/strings',
-    'uuid',
-    'arches',
-    'viewmodels/alert-json',
-    'templates/views/components/etl_modules/import-single-csv.htm',
-    'views/components/simple-switch',
-    'bindings/datatable',
-    'bindings/dropzone',
-    'bindings/resizable-sidepanel',
-], function(ko, koMapping, $, dropzone, stringUtils, uuid, arches, JsonErrorAlertViewModel, importSingleCSVTemplate) {
-    const viewModel = function(params) {
+import ko from "knockout";
+import koMapping from "knockout-mapping";
+import $ from "jquery";
+import dropzone from "dropzone";
+import stringUtils from "utils/strings";
+import uuid from "uuid";
+import arches from "arches";
+import JsonErrorAlertViewModel from "viewmodels/alert-json";
+import importSingleCSVTemplate from "templates/views/components/etl_modules/import-single-csv-plugin.htm";
+import "views/components/simple-switch";
+import "bindings/datatable";
+import "bindings/dropzone";
+import "bindings/resizable-sidepanel";
+
+
+const viewModel = function(params) {
         const self = this;
         this.loadDetails = params.load_details || ko.observable();
         this.state = params.state;
@@ -421,10 +421,9 @@ define([
         };
 
         this.init();
-    };
-    ko.components.register('import-single-csv', {
-        viewModel: viewModel,
-        template: importSingleCSVTemplate,
-    });
-    return viewModel;
+};
+ko.components.register('import-single-csv-plugin', {
+    viewModel: viewModel,
+    template: importSingleCSVTemplate,
 });
+export default viewModel;

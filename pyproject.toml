@@ -20,9 +20,10 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "arches>=7.6.17,<7.7.0",
+    "arches>=7.6.17,<8.3.0",
+    "packaging==26.2",
 ]
-version = "0.0.2"
+version = "0.1.0"
 
 [project.urls]
 Homepage = "https://archesproject.org/"
