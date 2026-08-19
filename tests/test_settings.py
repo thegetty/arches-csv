@@ -18,9 +18,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 
-from arches_csv.settings import *
+from arches_nested_tile_csv_importer.settings import *
 
-PACKAGE_NAME = "arches_csv"
+PACKAGE_NAME = "arches_nested_tile_csv_importer"
 
 PROJECT_TEST_ROOT = os.path.dirname(__file__)
 MEDIA_ROOT = os.path.join(PROJECT_TEST_ROOT, "fixtures", "data")
@@ -38,7 +38,7 @@ DATABASES = {
         "CONN_MAX_AGE": 0,
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "HOST": "localhost",
-        "NAME": "arches_csv",
+        "NAME": "arches_nested_tile_csv_importer",
         "OPTIONS": {},
         "PASSWORD": "postgis",
         "PORT": "5432",

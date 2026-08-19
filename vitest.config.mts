@@ -41,7 +41,7 @@ function generateConfig(): Promise<UserConfigExport> {
             test: {
                 alias: alias,
                 coverage: {
-                    include: [path.join('arches_csv', 'src', path.sep)],
+                    include: [path.join('arches_nested_tile_csv_importer', 'src', path.sep)],
                     exclude: exclude,
                     reporter: [
                         ['clover', { 'file': 'coverage.xml' }],

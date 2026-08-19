@@ -3,7 +3,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "arches_csv"
+name = "arches-nested-tile-csv-importer"
 readme = "README.md"
 authors = []
 license = {text = "GNU AGPL3"}
@@ -23,7 +23,7 @@ dependencies = [
     "arches>=7.6.17,<8.3.0",
     "packaging==26.2",
 ]
-version = "0.1.0"
+version = "0.1.1"
 
 [project.urls]
 Homepage = "https://archesproject.org/"
@@ -42,4 +42,4 @@ dev = [
 ]
 
 [tool.setuptools]
-packages = ["arches_csv"]
+packages = ["arches_nested_tile_csv_importer"]

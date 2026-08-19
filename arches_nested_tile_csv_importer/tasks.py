@@ -17,14 +17,13 @@ def load_single_csv(
     id_label,
     updatevalue
 ):
-    from arches_csv.etl_modules import import_single_csv
-
     logger = logging.getLogger(__name__)
 
     try:
+        from arches_nested_tile_csv_importer.etl_modules.import_single_csv_plugin import ImportSingleCsv
 
-        ImportSingleCsv = import_single_csv.ImportSingleCsv(loadid=loadid)
-        ImportSingleCsv.run_load_task(
+        import_single_csv = ImportSingleCsv(loadid=loadid)
+        import_single_csv.run_load_task(
             userid,
             loadid,
             graphid,
@@ -33,7 +32,7 @@ def load_single_csv(
             csv_mapping,
             csv_file_name,
             id_label,
-            updatevalue
+            updatevalue,
         )
 
         load_event = models.LoadEvent.objects.get(loadid=loadid)
