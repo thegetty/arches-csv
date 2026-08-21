@@ -62,7 +62,7 @@ Example:
 ```python
 INSTALLED_APPS = (
     # Django, Arches, and project apps...
-    "arches_nested_tile_csv_importer.apps.ArchesNestedTileCsvImporterConfig",
+    "arches_nested_tile_csv_importer",
 )
 
 # Keep arches.app last so extension templates and static assets can override
