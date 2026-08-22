@@ -17,7 +17,7 @@ from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import ETLModule, GraphModel, Node, NodeGroup, LoadStaging, TileModel
 from arches.app.models.system_settings import settings
-import arches_csv.tasks as tasks
+import arches_nested_tile_csv_importer.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.file_validator import FileValidator
 from arches.app.etl_modules.base_import_module import BaseImportModule

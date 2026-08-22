@@ -10,7 +10,7 @@ def add_csv_etl_module(apps, schema_editor):
         etlmoduleid=MODULE_ID,
         defaults={
             "name": "Import Single CSV Plugin",
-            "description": "Import a single CSV file using the external arches-csv plugin.",
+            "description": "Import a CSV file of nested tile data",
             "etl_type": "import",
             "component": "views/components/etl_modules/import-single-csv-plugin",
             "componentname": "import-single-csv-plugin",

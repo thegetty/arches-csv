@@ -1,5 +1,5 @@
 import { beforeAll, vi } from 'vitest';
-import '@/arches_csv/declarations.d.ts';
+import '@/arches_nested_tile_csv_importer/declarations.d.ts';
 
 
 beforeAll(() => {

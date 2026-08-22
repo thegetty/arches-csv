@@ -1,6 +1,6 @@
 [run]
 source =
-    arches_csv/
+    arches_nested_tile_csv_importer/
 
 omit =
     */python?.?/*
